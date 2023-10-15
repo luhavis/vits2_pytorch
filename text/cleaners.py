@@ -14,10 +14,11 @@ hyperparameter. Some cleaners are English-specific. You'll typically want to use
 
 import re
 from unidecode import unidecode
-from phonemizer import phonemize
-from phonemizer.backend import EspeakBackend
-backend = EspeakBackend("en-us", preserve_punctuation=True, with_stress=True)
+# from phonemizer import phonemize
+# from phonemizer.backend import EspeakBackend
+# backend = EspeakBackend("en-us", preserve_punctuation=True, with_stress=True)
 
+from text.korean import latin_to_hangul, number_to_hangul, divide_hangul, korean_to_lazy_ipa, korean_to_ipa
 
 # Regular expression matching whitespace:
 _whitespace_re = re.compile(r"\s+")
@@ -54,8 +55,8 @@ def expand_abbreviations(text):
     return text
 
 
-def expand_numbers(text):
-    return normalize_numbers(text)
+# def expand_numbers(text):
+#     return normalize_numbers(text)
 
 
 def lowercase(text):
@@ -85,38 +86,47 @@ def transliteration_cleaners(text):
     return text
 
 
-def english_cleaners(text):
-    """Pipeline for English text, including abbreviation expansion."""
-    text = convert_to_ascii(text)
-    text = lowercase(text)
-    text = expand_abbreviations(text)
-    phonemes = phonemize(text, language="en-us", backend="espeak", strip=True)
-    phonemes = collapse_whitespace(phonemes)
-    return phonemes
+# def english_cleaners(text):
+#     """Pipeline for English text, including abbreviation expansion."""
+#     text = convert_to_ascii(text)
+#     text = lowercase(text)
+#     text = expand_abbreviations(text)
+#     phonemes = phonemize(text, language="en-us", backend="espeak", strip=True)
+#     phonemes = collapse_whitespace(phonemes)
+#     return phonemes
 
 
-def english_cleaners2(text):
-    """Pipeline for English text, including abbreviation expansion. + punctuation + stress"""
-    text = convert_to_ascii(text)
-    text = lowercase(text)
-    text = expand_abbreviations(text)
-    phonemes = phonemize(
-        text,
-        language="en-us",
-        backend="espeak",
-        strip=True,
-        preserve_punctuation=True,
-        with_stress=True,
-    )
-    phonemes = collapse_whitespace(phonemes)
-    return phonemes
+# def english_cleaners2(text):
+#     """Pipeline for English text, including abbreviation expansion. + punctuation + stress"""
+#     text = convert_to_ascii(text)
+#     text = lowercase(text)
+#     text = expand_abbreviations(text)
+#     phonemes = phonemize(
+#         text,
+#         language="en-us",
+#         backend="espeak",
+#         strip=True,
+#         preserve_punctuation=True,
+#         with_stress=True,
+#     )
+#     phonemes = collapse_whitespace(phonemes)
+#     return phonemes
 
 
-def english_cleaners3(text):
-    """Pipeline for English text, including abbreviation expansion. + punctuation + stress"""
-    text = convert_to_ascii(text)
-    text = lowercase(text)
-    text = expand_abbreviations(text)
-    phonemes = backend.phonemize([text], strip=True)[0]
-    phonemes = collapse_whitespace(phonemes)
-    return phonemes
+# def english_cleaners3(text):
+#     """Pipeline for English text, including abbreviation expansion. + punctuation + stress"""
+#     text = convert_to_ascii(text)
+#     text = lowercase(text)
+#     text = expand_abbreviations(text)
+#     phonemes = backend.phonemize([text], strip=True)[0]
+#     phonemes = collapse_whitespace(phonemes)
+#     return phonemes
+
+def korean_cleaners(text):
+    '''Pipeline for Korean text'''
+    text = latin_to_hangul(text)
+    text = number_to_hangul(text)
+    text = divide_hangul(text)
+    if re.match('[\u3131-\u3163]', text[-1]):
+        text += '.'
+    return text
